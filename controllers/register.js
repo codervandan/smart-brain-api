@@ -3,8 +3,9 @@
 const registerHandler = async (req, res, db, bcrypt) => {
   const { email, name, password } = req.body;
 
+  // Validate input
   if (!email || !name || !password) {
-    return res.status(400).json({ error: 'incorrect form submission' });
+    return res.status(400).json({ error: 'Incorrect form submission' });
   }
 
   const hash = bcrypt.hashSync(password);
@@ -16,27 +17,38 @@ const registerHandler = async (req, res, db, bcrypt) => {
         .insert({ hash, email })
         .returning('email');
 
-      console.log('Inserted into login:', loginEmailArr);
+      if (!loginEmailArr || loginEmailArr.length === 0) {
+        throw new Error('Failed to insert into login');
+      }
 
-      const plainEmail = typeof loginEmailArr[0] === 'object' ? loginEmailArr[0].email : loginEmailArr[0];
+      const plainEmail =
+        typeof loginEmailArr[0] === 'object' ? loginEmailArr[0].email : loginEmailArr[0];
 
       // Insert into users table
       const userRows = await trx('users')
         .insert({
           name,
           email: plainEmail,
-          joined: new Date()
+          joined: new Date() // entries column will default to 0 automatically
         })
         .returning('*');
 
-      console.log('Inserted into users:', userRows[0]);
+      if (!userRows || userRows.length === 0) {
+        throw new Error('Failed to insert into users');
+      }
 
       // Respond with the created user
       res.json(userRows[0]);
     });
   } catch (err) {
     console.error('Register error:', err);
-    res.status(400).json({ error: 'unable to register' });
+
+    // Handle duplicate email more gracefully
+    if (err.code === '23505') { // PostgreSQL unique violation
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+
+    res.status(400).json({ error: 'Unable to register' });
   }
 };
 
