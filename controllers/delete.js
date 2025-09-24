@@ -1,4 +1,5 @@
-const handleDeleteUser = (req, res, db) => {
+// delete.js
+const deleteUserHandler = (req, res, db) => {
   const { id } = req.params;
   db('users')
     .where({ id })
@@ -11,8 +12,6 @@ const handleDeleteUser = (req, res, db) => {
       }
     })
     .catch(() => res.status(400).json({ error: 'unable to delete user' }));
-}
+};
 
-module.exports = {
-  handleDeleteUser
-}
+export default deleteUserHandler;

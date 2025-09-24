@@ -1,4 +1,5 @@
-const handleProfileGet = (req, res, db) => {
+// profile.js
+const profileHandler = (req, res, db) => {
   const { id } = req.params;
   db('users')
     .where({ id })
@@ -10,8 +11,6 @@ const handleProfileGet = (req, res, db) => {
       res.json(data[0]);
     })
     .catch(() => res.status(400).json({ error: 'error fetching user' }));
-}
+};
 
-module.exports = {
-  handleProfileGet
-}
+export default profileHandler;

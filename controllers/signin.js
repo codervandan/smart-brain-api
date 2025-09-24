@@ -1,5 +1,5 @@
-//Signin 
-const handleSignin = (db, bcrypt) => (req, res) => {
+// signin.js
+const signinHandler = (db, bcrypt) => (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'incorrect form submission' });
@@ -17,20 +17,17 @@ const handleSignin = (db, bcrypt) => (req, res) => {
         return res.status(400).json({ error: 'wrong credentials' });
       }
 
-      // fetch user profile safely
       db.select('*').from('users')
         .where('email', '=', email)
         .then(user => {
           if (!user.length) {
             return res.status(400).json({ error: 'user not found' });
           }
-          res.json(user[0]); // always send a valid JSON object
+          res.json(user[0]);
         })
         .catch(() => res.status(400).json({ error: 'unable to get user' }));
     })
     .catch(() => res.status(400).json({ error: 'wrong credentials' }));
-}
-
-module.exports = {
-  handleSignin: handleSignin
 };
+
+export default signinHandler;
