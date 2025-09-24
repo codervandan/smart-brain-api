@@ -17,11 +17,9 @@ import { handleApiCall, handleImage } from './controllers/image.js';
 const db = knex({
   client: 'pg',
   connection: {
+    // Use the full DATABASE_URL from Render; SSL required for Render Postgres
     connectionString: process.env.DATABASE_URL,
-    // Use SSL only if DATABASE_URL is on Render
-    ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes("render.com") 
-         ? { rejectUnauthorized: false } 
-         : false
+    ssl: { rejectUnauthorized: false }
   }
 });
 
