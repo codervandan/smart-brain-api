@@ -18,12 +18,10 @@ const db = knex({
   client: 'pg',
   connection: {
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    host: process.env.DATABASE_HOST,
-    port: 5432,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PW,
-    database: process.env.DATABASE_DB
+    // Use SSL only if DATABASE_URL is on Render
+    ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes("render.com") 
+         ? { rejectUnauthorized: false } 
+         : false
   }
 });
 
@@ -31,7 +29,7 @@ const app = express();
 
 // CORS configuration
 const allowedOrigins = [
-  'http://localhost:3000',                    // React dev server
+  'http://localhost:3000',                     // React dev server
   'https://facerecognitionbrain-9n95.onrender.com' // Deployed frontend
 ];
 
