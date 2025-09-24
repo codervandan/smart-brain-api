@@ -1,6 +1,6 @@
 // register.js
 
-const registerHandler = (req, res, db, bcrypt) => {
+const registerHandler = async (req, res, db, bcrypt) => {
   const { email, name, password } = req.body;
 
   if (!email || !name || !password) {
@@ -9,34 +9,35 @@ const registerHandler = (req, res, db, bcrypt) => {
 
   const hash = bcrypt.hashSync(password);
 
-  db.transaction(trx => {
-    trx.insert({ hash, email })
-      .into('login')
-      .returning('email')
-      .then(loginEmail => {
-        const plainEmail = typeof loginEmail[0] === 'object' ? loginEmail[0].email : loginEmail[0];
-        return trx('users')
-          .insert({
-            name,
-            email: plainEmail,
-            joined: new Date()
-          })
-          .returning('*')
-          .then(userRows => res.json(userRows[0]))
-          .catch(err => {
-            console.error('Error inserting user:', err);
-            res.status(400).json({ error: 'unable to register user' });
-          });
-      })
-      .then(() => trx.commit())
-      .catch(err => {
-        console.error('Transaction error during commit:', err);
-        trx.rollback();
-      });
-  }).catch(err => {
-    console.error('Transaction error:', err);
+  try {
+    await db.transaction(async trx => {
+      // Insert into login table
+      const loginEmailArr = await trx('login')
+        .insert({ hash, email })
+        .returning('email');
+
+      console.log('Inserted into login:', loginEmailArr);
+
+      const plainEmail = typeof loginEmailArr[0] === 'object' ? loginEmailArr[0].email : loginEmailArr[0];
+
+      // Insert into users table
+      const userRows = await trx('users')
+        .insert({
+          name,
+          email: plainEmail,
+          joined: new Date()
+        })
+        .returning('*');
+
+      console.log('Inserted into users:', userRows[0]);
+
+      // Respond with the created user
+      res.json(userRows[0]);
+    });
+  } catch (err) {
+    console.error('Register error:', err);
     res.status(400).json({ error: 'unable to register' });
-  });
+  }
 };
 
 export default registerHandler;
