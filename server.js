@@ -1,5 +1,4 @@
 // server.js
-import { handleApiCall, handleImage } from './controllers/image.js';
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
 import cors from 'cors';
@@ -13,8 +12,7 @@ import registerHandler from './controllers/register.js';
 import profileHandler from './controllers/profile.js';
 import updateHandler from './controllers/update.js';
 import deleteUserHandler from './controllers/delete.js';
-import imageHandler from './controllers/image.js';
-import imageHandlerApiCall from './controllers/image.js';
+import { handleApiCall, handleImage } from './controllers/image.js';
 
 const db = knex({
   client: 'pg',
@@ -51,11 +49,11 @@ app.put('/profile/:id', (req, res) => updateHandler(req, res, db));
 // Delete User
 app.delete('/profile/:id', (req, res) => deleteUserHandler(req, res, db));
 
-// Image (increment entries)
-app.put('/image', (req, res) => imageHandler(req, res, db));
+// Increment entries
+app.put('/image', (req, res) => handleImage(req, res, db));
 
-// Image (Clarifai API call)
-app.post('/imageurl', (req, res) => imageHandlerApiCall(req, res));
+// Clarifai API call
+app.post('/imageurl', (req, res) => handleApiCall(req, res));
 
 // Set server to listen on environment port or 3001
 const PORT = process.env.PORT || 3001;
