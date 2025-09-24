@@ -14,13 +14,12 @@ import deleteUserHandler from './controllers/delete.js';
 import { handleApiCall, handleImage } from './controllers/image.js';
 
 // Database setup
+// Using only DATABASE_URL; no SSL, no separate host/user/password
+// DATABASE_URL should be set in Render environment variables:
+// Example: postgresql://user:password@host:5432/dbname
 const db = knex({
   client: 'pg',
-  connection: {
-    // Use the full DATABASE_URL from Render; SSL required for Render Postgres
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-  }
+  connection: process.env.DATABASE_URL
 });
 
 const app = express();
@@ -35,6 +34,8 @@ app.use(cors({
   origin: function(origin, callback){
     // Allow requests with no origin (like Postman or curl)
     if(!origin) return callback(null, true);
+
+    // Only allow origins in allowedOrigins
     if(allowedOrigins.indexOf(origin) === -1){
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
@@ -45,35 +46,36 @@ app.use(cors({
   credentials: true
 }));
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
 // ROUTES
 
-// Root
+// Root route
 app.get('/', (req, res) => rootHandler(req, res, db));
 
-// Signin
+// Signin route
 app.post('/signin', (req, res) => signinHandler(req, res, db, bcrypt));
 
-// Register
+// Register route
 app.post('/register', (req, res) => registerHandler(req, res, db, bcrypt));
 
-// Profile
+// Profile route
 app.get('/profile/:id', (req, res) => profileHandler(req, res, db));
 
-// Update Profile
+// Update Profile route (e.g., change name)
 app.put('/profile/:id', (req, res) => updateHandler(req, res, db));
 
-// Delete User
+// Delete User route
 app.delete('/profile/:id', (req, res) => deleteUserHandler(req, res, db));
 
-// Increment entries
+// Increment entries (image submissions)
 app.put('/image', (req, res) => handleImage(req, res, db));
 
 // Clarifai API call
 app.post('/imageurl', (req, res) => handleApiCall(req, res));
 
-// Start server
+// Start server on environment port or default to 3001
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
