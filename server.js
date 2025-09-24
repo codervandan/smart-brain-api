@@ -6,6 +6,7 @@ const knex = require('knex');
 
 // Controllers 
 const register = require('./controllers/register');
+import registerHandler from "./controllers/register.js"
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const update = require('./controllers/update');
