@@ -17,10 +17,13 @@ import { handleApiCall, handleImage } from './controllers/image.js';
 const db = knex({
   client: 'pg',
   connection: {
-    host: 'dpg-d3a38kvdiees73b7io30-a', // Update to your database host
-    user: 'smart_brain_db_kgb4_user', // Update with your DB user
-    password: 'IxiB1uZZV5nD2HlGwUaaibTOM0fYPuoq', // Update with your DB password
-    database: 'smart_brain_db_kgb4' // Update with your DB name
+    connectionString: proceses.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    host: process.env.DATABASE_HOST, // Update to your database host
+    port: 5432,
+    user: process.env.DATABASE_USER, // Update with your DB user
+    password: process.env.DATABASE_PW, // Update with your DB password
+    database: proces.env.DATABASE_DB // Update with your DB name
   }
 });
 
