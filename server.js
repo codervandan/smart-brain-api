@@ -1,11 +1,9 @@
 // server.js
+import 'dotenv/config';       // loads .env first
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
 import cors from 'cors';
-// import knex from 'knex';
-import 'dotenv/config'; // automatically loads .env
-import db from './db.js'
-
+import db from './db.js';     // import db AFTER dotenv
 
 // Controllers
 import rootHandler from './controllers/root.js';
@@ -16,11 +14,12 @@ import updateHandler from './controllers/update.js';
 import deleteUserHandler from './controllers/delete.js';
 import { handleApiCall, handleImage } from './controllers/image.js';
 
+// Debug environment variables
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 console.log('DATABASE_SSL:', process.env.DATABASE_SSL);
 
-
 const app = express();
+
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:3000',                     // React dev server
@@ -29,52 +28,32 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function(origin, callback){
-    // Allow requests with no origin (like Postman or curl)
     if(!origin) return callback(null, true);
-
-    // Only allow origins in allowedOrigins
     if(allowedOrigins.indexOf(origin) === -1){
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      const msg = 'CORS policy does not allow this Origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET','POST','PUT','DELETE'],
   credentials: true
 }));
 
-
-// Middleware to parse JSON bodies
+// Parse JSON bodies
 app.use(express.json());
 
 // ROUTES
-
-// Root route
 app.get('/', (req, res) => rootHandler(req, res, db));
-
-// Signin route
 app.post('/signin', (req, res) => signinHandler(req, res, db, bcrypt));
-
-// Register route
 app.post('/register', (req, res) => registerHandler(req, res, db, bcrypt));
-
-// Profile route
 app.get('/profile/:id', (req, res) => profileHandler(req, res, db));
-
-// Update Profile route (e.g., change name)
 app.put('/profile/:id', (req, res) => updateHandler(req, res, db));
-
-// Delete User route
 app.delete('/profile/:id', (req, res) => deleteUserHandler(req, res, db));
-
-// Increment entries (image submissions)
 app.put('/image', (req, res) => handleImage(req, res, db));
-
-// Clarifai API call
 app.post('/imageurl', (req, res) => handleApiCall(req, res));
 
-// Start server on environment port or default to 3001
+// Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
