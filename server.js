@@ -2,9 +2,9 @@
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
 import cors from 'cors';
-import knex from 'knex';
-import db from './db.js'
+// import knex from 'knex';
 import 'dotenv/config'; // automatically loads .env
+import db from './db.js'
 
 
 // Controllers
@@ -19,20 +19,6 @@ import { handleApiCall, handleImage } from './controllers/image.js';
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 console.log('DATABASE_SSL:', process.env.DATABASE_SSL);
 
-// Database setup
-// Using only DATABASE_URL; no SSL, no separate host/user/password
-// DATABASE_URL should be set in Render environment variables:
-// Example: postgresql://user:password@host:5432/dbname
-// Database setup
-// const db = knex({
-//   client: 'pg',
-//   connection: {
-//     connectionString: process.env.DATABASE_URL,
-//     ssl: process.env.DATABASE_SSL === 'true' 
-//       ? { rejectUnauthorized: false } 
-//       : false
-//   }
-// });
 
 const app = express();
 // CORS configuration
