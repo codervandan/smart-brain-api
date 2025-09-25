@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt-nodejs';
 import cors from 'cors';
 import knex from 'knex';
 import db from './db.js'
+import 'dotenv/config'; // automatically loads .env
+
 
 // Controllers
 import rootHandler from './controllers/root.js';

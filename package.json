@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js",
     "start": "node server.js"
   },
   "keywords": [],
@@ -18,6 +17,7 @@
     "body-parser": "^2.2.0",
     "clarifai": "^2.9.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "knex": "^3.1.0",
     "node-fetch": "^2.7.0",
