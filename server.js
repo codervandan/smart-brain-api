@@ -19,7 +19,12 @@ import { handleApiCall, handleImage } from './controllers/image.js';
 // Example: postgresql://user:password@host:5432/dbname
 const db = knex({
   client: 'pg',
-  connection: process.env.DATABASE_URL
+  connection: {
+    connectionString: process.env.DATABASE_URL, // from Render dashboard
+    ssl: {
+      rejectUnauthorized: false   // required for Render hosted Postgres
+    }
+  }
 });
 
 const app = express();
